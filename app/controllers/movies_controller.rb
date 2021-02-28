@@ -25,6 +25,9 @@ class MoviesController < ApplicationController
   end
 
   def update
+    Movie.alls.each do |rating|
+      Movie.add(params[rating])
+    end
     @movie = Movie.find params[:id]
     @movie.update_attributes!(movie_params)
     flash[:notice] = "#{@movie.title} was successfully updated."
