@@ -26,7 +26,9 @@ class MoviesController < ApplicationController
 
   def update
     Movie.alls.each do |rating|
-      Movie.add(params[rating])
+      if params[rating] == true 
+        Movie.add(rating)
+      end
     end
     @movie = Movie.find params[:id]
     @movie.update_attributes!(movie_params)
