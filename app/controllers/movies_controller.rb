@@ -4,10 +4,21 @@ class MoviesController < ApplicationController
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
     # will render app/views/movies/show.<extension> by default
+    
   end
 
   def index
-    @movies = Movie.all
+    if params.key?("Back") or (!params.key?("ratings") and !params.key?("id"))
+      @movies = Movie.from_cookie(session, params)
+    else
+      @movies = Movie.movies_to_show(params)
+    end
+    
+    session["ratings"] = Movie.ratings
+    session["sort"] = Movie.sort_type
+    
+    @date_s = Movie.date_status
+    @title_s = Movie.title_status
   end
 
   def new
@@ -16,20 +27,17 @@ class MoviesController < ApplicationController
 
   def create
     @movie = Movie.create!(movie_params)
-    flash[:notice] = "#{@movie.title} was successfully created."
+    flash[:message] = "#{@movie.title} was successfully created."
     redirect_to movies_path
   end
 
   def edit
     @movie = Movie.find params[:id]
+    
   end
 
   def update
-    Movie.alls.each do |rating|
-      if params[rating] == true 
-        Movie.add(rating)
-      end
-    end
+    
     @movie = Movie.find params[:id]
     @movie.update_attributes!(movie_params)
     flash[:notice] = "#{@movie.title} was successfully updated."
